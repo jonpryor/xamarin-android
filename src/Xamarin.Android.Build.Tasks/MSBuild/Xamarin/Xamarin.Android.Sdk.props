@@ -11,7 +11,7 @@ Copyright (C) 2011-2016 Xamarin. All rights reserved.
 -->
 <Project InitialTargets="RedirectMonoAndroidSdkPaths;RemoveSdksCache" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<PropertyGroup>
+	<PropertyGroup Condition="'$(VsInstallRoot)' != ''">
 		<!-- Grab InstallationID from devenv.ini.isolation's InstallationID=[ID] -->
 		<DevEnvIni>$([System.IO.File]::ReadAllText('$(VsInstallRoot)\Common7\IDE\devenv.isolation.ini'))</DevEnvIni>
 		<InstallationIDEqualsIndex>$(DevEnvIni.IndexOf('InstallationID='))</InstallationIDEqualsIndex>
@@ -19,15 +19,15 @@ Copyright (C) 2011-2016 Xamarin. All rights reserved.
 		<VsInstallationID>$(DevEnvIni.Substring($(InstallationIDEqualsIndex), 8))</VsInstallationID>
 	</PropertyGroup>
 
-	<PropertyGroup>
+	<PropertyGroup Condition="'$(VsInstallRoot)' != ''">
 		<!-- Until VS2017+ includes its own ReferenceAssemblies outside of C:\Program Files (x86)\Reference Assemblies and into 
 			 the VsInstallRoot, we must override this ourselves for our SDKs -->
-		<TargetFrameworkRootPath>$(VsInstallRoot)\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\</TargetFrameworkRootPath>
-		<FrameworkPathOverride>$(TargetFrameworkRootPath)MonoAndroid\v1.0</FrameworkPathOverride>
+		<TargetFrameworkRootPath Condition="'$(TargetFrameworkRootPath)' == ''">$(VsInstallRoot)\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\</TargetFrameworkRootPath>
+		<FrameworkPathOverride Condition="'$(FrameworkPathOverride)' == ''">$(TargetFrameworkRootPath)MonoAndroid\v1.0</FrameworkPathOverride>
 		<XamarinAndroidSdkPropsImported>true</XamarinAndroidSdkPropsImported>
 	</PropertyGroup>
 
-	<Target Name="RedirectMonoAndroidSdkPaths">
+	<Target Name="RedirectMonoAndroidSdkPaths" Condition="'$(VsInstallRoot)' != ''">
 		<PropertyGroup>
 			<MonoAndroidToolsDirectory Condition=" '$(MonoAndroidToolsDirectory)' == '' ">$(VsInstallRoot)\MSBuild\Xamarin\Android</MonoAndroidToolsDirectory>
 			<MonoAndroidBinDirectory Condition=" '$(MonoAndroidBinDirectory)' == '' ">$(VsInstallRoot)\MSBuild\Xamarin\Android</MonoAndroidBinDirectory>
@@ -40,7 +40,7 @@ Copyright (C) 2011-2016 Xamarin. All rights reserved.
 		<Delete Files="$(IntermediateOutputPath)sdks.cache" />
 	</Target>
 
-	<UsingTask TaskName="SetVsMonoAndroidRegistryKey" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+	<UsingTask Condition="'$(VsInstallRoot)' != ''" TaskName="SetVsMonoAndroidRegistryKey" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
 		<ParameterGroup>
 			<InstallationID Required="true" />
 			<VisualStudioVersion Required="true" />
