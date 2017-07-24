@@ -1231,7 +1231,7 @@ namespace App1
 		[Test]
 		public void BuildWithExternalJavaLibrary ()
 		{
-			string multidex_jar = "$(MonoDroidInstallDirectory)\\lib\\mandroid\\android-support-multidex.jar";
+			string multidex_jar = @"$(MonoDroidInstallDirectory)\xbuild\Xamarin\Android\android-support-multidex.jar";
 			var binding = new XamarinAndroidBindingProject () {
 				ProjectName = "BuildWithExternalJavaLibraryBinding",
 				Jars = { new AndroidItem.InputJar (() => multidex_jar), },

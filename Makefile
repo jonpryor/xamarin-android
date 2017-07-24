@@ -90,7 +90,7 @@ prepare-external: prepare-deps
 	(cd $(call GetPath,JavaInterop) && make bin/BuildDebug/JdkInfo.props)
 
 prepare-props: prepare-external
-	cp Configuration.Java.Interop.Override.props external/Java.Interop/Configuration.Override.props
+	cp build-tools/scripts/Configuration.Java.Interop.Override.props external/Java.Interop/Configuration.Override.props
 	cp $(call GetPath,MonoSource)/mcs/class/msfinal.pub .
 
 prepare-msbuild: prepare-props

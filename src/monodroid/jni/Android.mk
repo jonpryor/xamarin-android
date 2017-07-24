@@ -14,7 +14,6 @@ LOCAL_CFLAGS =	$(COMMON_CFLAGS) \
 	-DSGEN_BRIDGE_VERSION=$(SGEN_BRIDGE_VERSION) \
 	-D_REENTRANT -DPLATFORM_ANDROID -DANDROID -DLINUX -Dlinux -D__linux_ \
 	-DHAVE_CONFIG_H -DJI_DLL_EXPORT -DMONO_DLL_EXPORT \
-	-I$(topdir)/libmonodroid/zip -I$(BUILDDIR)/include -I$(BUILDDIR)/include/eglib \
 	-fno-strict-aliasing \
 	-ffunction-sections \
 	-fomit-frame-pointer \

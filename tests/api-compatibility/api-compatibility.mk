@@ -25,7 +25,7 @@ $(MONO_API_HTML): $(wildcard $(MONO_API_HTML_DIR)/*.cs) $(MONO_OPTIONS_SRC)
 		-r:System.Xml.dll -r:System.Xml.Linq.dll
 
 MONO_API_INFO_REFS  = \
-  bin/$(CONFIGURATION)/lib/mandroid/Xamarin.Android.Cecil.dll
+  bin/$(CONFIGURATION)/lib/xamarin.android/xbuild/Xamarin/Android/Xamarin.Android.Cecil.dll
 
 $(MONO_API_INFO): $(wildcard $(MONO_API_INFO_DIR)/*.cs) $(MONO_OPTIONS_SRC)
 	$(CSC) -out:$@ $^ /main:CorCompare.Driver \

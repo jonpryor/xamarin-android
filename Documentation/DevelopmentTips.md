@@ -65,7 +65,7 @@ varies based on the operating system you're building from:
 Once the assemblies have been rebuilt, they can be copied into the appropriate
 Xamarin.Android SDK directory by using the `_InstallBcl` target:
 
-	# This updates bin/$(Configuration)/lib/xbuild-frameworks/MonoAndroid/v1.0/ASSEMBLY.dll
+	# This updates bin/$(Configuration)/lib/xamarin.android/xbuild-frameworks/MonoAndroid/v1.0/ASSEMBLY.dll
 	$ xbuild build-tools/mono-runtimes/mono-runtimes.mdproj /t:_InstallBcl
 
 # Update Directory

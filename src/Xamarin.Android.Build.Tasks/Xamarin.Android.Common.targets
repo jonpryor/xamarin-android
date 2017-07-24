@@ -583,7 +583,7 @@ Copyright (C) 2011-2012 Xamarin. All rights reserved.
 <Target Name="_GetReferenceAssemblyPaths">
 	<GetReferenceAssemblyPaths
 			TargetFrameworkMoniker="$(TargetFrameworkIdentifier),Version=v1.0"
-			RootPath="$(TargetFrameworkRootPath)">
+			RootPath="$(XATargetFrameworkRootPath)">
 		<Output TaskParameter="ReferenceAssemblyPaths" PropertyName="_XATargetFrameworkDirectories" />
 	</GetReferenceAssemblyPaths>
 </Target>
@@ -598,7 +598,6 @@ Copyright (C) 2011-2012 Xamarin. All rights reserved.
 			SequencePointsMode="$(_AndroidSequencePointsMode)"
 			BuildingInsideVisualStudio="$(BuildingInsideVisualStudio)"
 			JavaSdkPath="$(JavaSdkDirectory)"
-			MonoAndroidBinPath="$(MonoAndroidBinDirectory)"
 			MonoAndroidToolsPath="$(MonoAndroidToolsDirectory)"
 			ProjectFilePath="$(MSBuildProjectFullPath)"
 			ReferenceAssemblyPaths="$(_XATargetFrameworkDirectories)"
@@ -617,8 +616,7 @@ Copyright (C) 2011-2012 Xamarin. All rights reserved.
 		<Output TaskParameter="AndroidSdkBuildToolsPath"  PropertyName="AndroidSdkBuildToolsPath"   Condition="'$(AndroidSdkBuildToolsPath)' == ''" />
 		<Output TaskParameter="JavaSdkPath"               PropertyName="JavaSdkDirectory"           Condition="'$(JavaSdkDirectory)' == ''" />
 		<Output TaskParameter="MonoAndroidToolsPath"      PropertyName="MonoAndroidToolsDirectory"  Condition="'$(MonoAndroidToolsDirectory)' == ''" />
-		<Output TaskParameter="MonoAndroidBinPath"        PropertyName="MonoAndroidBinDirectory"    Condition="'$(MonoAndroidBinDirectory)' == ''" />
-		<Output TaskParameter="MonoAndroidIncludePath"    PropertyName="MonoAndroidIncludeDirectory"	Condition="'$(MonoAndroidIncludeDirectory)' == ''" />
+		<Output TaskParameter="MonoAndroidBinPath"        PropertyName="MonoAndroidBinDirectory" />
 		<Output TaskParameter="ZipAlignPath"              PropertyName="ZipAlignToolPath"           Condition="'$(ZipAlignToolPath)' == ''" />
 		<Output TaskParameter="AndroidSdkBuildToolsBinPath" PropertyName="AndroidSdkBuildToolsBinPath" Condition="'$(AndroidSdkBuildToolsBinPath)' == ''" />
 		<Output TaskParameter="AndroidSequencePointsMode"   PropertyName="_SequencePointsMode"         Condition="'$(_SequencePointsMode)' == ''" />
@@ -692,14 +690,6 @@ because xbuild doesn't support framework reference assemblies.
 		<Output TaskParameter="Value" PropertyName="_MonoAndroidToolsDirectory"
 			Condition="!HasTrailingSlash('$(_MonoAndroidToolsDirectory)')" />
 	</CreateProperty>
-
-	<CreateProperty Value="$(MonoAndroidBinDirectory)">
-		<Output TaskParameter="Value" PropertyName="_MonoAndroidBinDirectory"/>
-	</CreateProperty>
-	<CreateProperty Value="$(_MonoAndroidBinDirectory)\">
-		<Output TaskParameter="Value" PropertyName="_MonoAndroidBinDirectory"
-			Condition="!HasTrailingSlash('$(_MonoAndroidBinDirectory)')" />
-	</CreateProperty>
 	
 	<CreateProperty Value="$(AndroidNdkDirectory)">
 		<Output TaskParameter="Value" PropertyName="_AndroidNdkDirectory"/>
@@ -738,7 +728,6 @@ because xbuild doesn't support framework reference assemblies.
 	</CreateProperty>
 	
 	<Message Text="MonoAndroid Tools: $(_MonoAndroidToolsDirectory)"/>
-	<Message Text="MonoAndroid Binaries: $(_MonoAndroidBinDirectory)"/>
 	<Message Text="Android Platform API level: $(_AndroidApiLevel)"/>
 	<Message Text="TargetFrameworkVersion: $(_TargetFrameworkVersion)"/>
 	<Message Text="Android NDK: $(_AndroidNdkDirectory)"/>
@@ -2111,7 +2100,6 @@ because xbuild doesn't support framework reference assemblies.
 	AndroidAotMode="$(AndroidAotMode)"
 	AndroidNdkDirectory="$(_AndroidNdkDirectory)"
 	AndroidApiLevel="$(_AndroidApiLevel)"
-	SdkBinDirectory="$(MonoAndroidBinDirectory)"
 	SupportedAbis="$(_BuildTargetAbis)"
 	AndroidSequencePointsMode="$(_SequencePointsMode)"
 	AotAdditionalArguments="$(AndroidAotAdditionalArguments)"
@@ -2148,7 +2136,6 @@ because xbuild doesn't support framework reference assemblies.
   <BuildApk
     AndroidNdkDirectory="$(_AndroidNdkDirectory)"
     ApkInputPath="$(_PackagedResources)"
-    SdkBinDirectory="$(MonoAndroidBinDirectory)"
     ApkOutputPath="$(ApkFileIntermediate)"
     BundleAssemblies="$(BundleAssemblies)"
     BundleNativeLibraries="$(_BundleResultNativeLibraries)"
@@ -2218,7 +2205,7 @@ because xbuild doesn't support framework reference assemblies.
 
   <MakeDir Directories="$(OutDir)$(_AndroidPackage).apk.mSYM" Condition=" '$(MonoSymbolArchive)' == 'True' " />
   <Exec
-    Command="&quot;$(_MonoAndroidBinDirectory)mono-symbolicate&quot; store-symbols &quot;$(OutDir)$(_AndroidPackage).apk.mSYM&quot; &quot;$(MonoAndroidIntermediate)android/assets&quot;"
+    Command="&quot;$(MonoAndroidBinDirectory)mono-symbolicate&quot; store-symbols &quot;$(OutDir)$(_AndroidPackage).apk.mSYM&quot; &quot;$(MonoAndroidIntermediate)android/assets&quot;"
     Condition=" '$(MonoSymbolArchive)' == 'True' "
   />
 

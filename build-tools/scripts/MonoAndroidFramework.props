@@ -3,7 +3,6 @@
   <!-- Note: ..\..\Configuration.props *must* be included FIRST -->
   <PropertyGroup>
     <TargetFrameworkVersion>$(AndroidFrameworkVersion)</TargetFrameworkVersion>
-    <TargetFrameworkRootPath>$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\lib\xbuild-frameworks</TargetFrameworkRootPath>
-    <FrameworkPathOverride>$(TargetFrameworkRootPath)\MonoAndroid\v1.0</FrameworkPathOverride>
+    <XATargetFrameworkRootPath>$(XAInstallPrefix)xbuild-frameworks</XATargetFrameworkRootPath>
   </PropertyGroup>
 </Project>
