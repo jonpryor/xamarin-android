@@ -4,7 +4,6 @@
 #include <errno.h>
 #include <assert.h>
 #include <ctype.h>
-#include <dlfcn.h>
 #include <fcntl.h>
 
 #ifdef ANDROID
@@ -27,6 +26,8 @@
 #include "jni-wrappers.hh"
 #include "xamarin-app.hh"
 #include "cpp-util.hh"
+#include "java-interop-dlfcn.h"
+#include "java-interop.h"
 
 #if defined (DEBUG) || !defined (ANDROID)
 namespace xamarin::android::internal {
@@ -358,9 +359,11 @@ AndroidSystem::load_dso (const char *path, int dl_flags, bool skip_exists_check)
 		return nullptr;
 	}
 
-	void *handle = dlopen (path, dl_flags);
+	char *error = nullptr;
+	void *handle = java_interop_load_library (path, 0, &error);
 	if (handle == nullptr && utils.should_log (LOG_ASSEMBLY))
-		log_info_nocheck (LOG_ASSEMBLY, "Failed to load shared library '%s'. %s", path, dlerror ());
+		log_info_nocheck (LOG_ASSEMBLY, "Failed to load shared library '%s'. %s", path, error);
+	java_interop_free (error);
 	return handle;
 }
 
