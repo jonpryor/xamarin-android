@@ -360,7 +360,8 @@ AndroidSystem::load_dso (const char *path, int dl_flags, bool skip_exists_check)
 	}
 
 	char *error = nullptr;
-	void *handle = java_interop_load_library (path, 0, &error);
+	void *handle = java_interop_load_library (path, dl_flags, &error);
+	log_warn (LOG_DEFAULT, "# jonp: AndroidSystem::load_dso(`%s`): handle=%p error=%s", path, handle, error);
 	if (handle == nullptr && utils.should_log (LOG_ASSEMBLY))
 		log_info_nocheck (LOG_ASSEMBLY, "Failed to load shared library '%s'. %s", path, error);
 	java_interop_free (error);

@@ -12,6 +12,10 @@
 
 #if defined (APPLE_OS_X)
 #include <dlfcn.h>
+#else
+#define RTLD_LAZY 0
+#define RTLD_GLOBAL 0
+#define RTLD_NOW 0
 #endif  // def APPLE_OX_X
 
 #include <fcntl.h>
@@ -156,11 +160,12 @@ MonodroidRuntime::setup_bundled_app (const char *dso_name)
 	if (!application_config.is_a_bundled_app)
 		return;
 
+	static int dlopen_flags = RTLD_LAZY;
 	void *libapp = nullptr;
 
 	if (androidSystem.is_embedded_dso_mode_enabled ()) {
 		log_info (LOG_DEFAULT, "bundle app: embedded DSO mode");
-		libapp = androidSystem.load_dso_from_any_directories (dso_name, 0);
+		libapp = androidSystem.load_dso_from_any_directories (dso_name, dlopen_flags);
 	} else {
 		bool needs_free = false;
 		log_info (LOG_DEFAULT, "bundle app: normal mode");
@@ -169,7 +174,7 @@ MonodroidRuntime::setup_bundled_app (const char *dso_name)
 		if (bundle_path == nullptr)
 			return;
 		log_info (LOG_BUNDLE, "Attempting to load bundled app from %s", bundle_path);
-		libapp = androidSystem.load_dso (bundle_path, 0, true);
+		libapp = androidSystem.load_dso (bundle_path, dlopen_flags, true);
 		if (needs_free)
 			delete[] bundle_path;
 	}
@@ -1071,7 +1076,13 @@ setup_gc_logging (void)
 force_inline int
 MonodroidRuntime::convert_dl_flags (int flags)
 {
-	return 0;
+	int lflags = flags & static_cast<int> (MONO_DL_LOCAL) ? 0: RTLD_GLOBAL;
+
+	if (flags & static_cast<int> (MONO_DL_LAZY))
+		lflags |= RTLD_LAZY;
+	else
+		lflags |= RTLD_NOW;
+	return lflags;
 }
 
 force_inline void
@@ -1191,6 +1202,7 @@ MonodroidRuntime::monodroid_dlsym (void *handle, const char *name, char **err, [
 	char *e = nullptr;
 
 	s = java_interop_get_symbol_address (handle, name, &e);
+	log_warn (LOG_DEFAULT, "# jonp: monodroid_dlsym(%p, '%s') s=%p e=%s", handle, name, s, e);
 
 	if (!s && err) {
 		*err = utils.monodroid_strdup_printf ("Could not find symbol '%s': %s", name, e);
@@ -1372,7 +1384,7 @@ MonodroidRuntime::disable_external_signal_handlers (void)
 	if (!androidSystem.is_mono_llvm_enabled ())
 		return;
 
-	void *llvm  = androidSystem.load_dso ("libLLVM.so", 0, TRUE);
+	void *llvm  = androidSystem.load_dso ("libLLVM.so", RTLD_LAZY, TRUE);
 	if (llvm) {
 		bool *disable_signals = reinterpret_cast<bool*> (java_interop_get_symbol_address (llvm, "_ZN4llvm23DisablePrettyStackTraceE", nullptr));
 		if (disable_signals) {
@@ -1607,7 +1619,7 @@ MonodroidRuntime::Java_mono_android_Runtime_initInternal (JNIEnv *env, jclass kl
 	if (my_location != nullptr) {
 		simple_pointer_guard<char, false> dso_path (utils.path_combine (my_location, API_DSO_NAME));
 		log_info (LOG_DEFAULT, "Attempting to load %s", dso_path.get ());
-		api_dso_handle = java_interop_load_library (dso_path.get (), 0, nullptr);
+		api_dso_handle = java_interop_load_library (dso_path.get (), RTLD_NOW, nullptr);
 #if defined (APPLE_OS_X)
 		delete[] my_location;
 #else   // !defined(APPLE_OS_X)
@@ -1617,11 +1629,11 @@ MonodroidRuntime::Java_mono_android_Runtime_initInternal (JNIEnv *env, jclass kl
 
 	if (api_dso_handle == nullptr) {
 		log_info (LOG_DEFAULT, "Attempting to load %s with \"bare\" dlopen", API_DSO_NAME);
-		api_dso_handle = java_interop_load_library (API_DSO_NAME, 0, nullptr);
+		api_dso_handle = java_interop_load_library (API_DSO_NAME, RTLD_NOW, nullptr);
 	}
 #endif  // defined(WINDOWS) || defined(APPLE_OS_X)
 	if (api_dso_handle == nullptr)
-		api_dso_handle = androidSystem.load_dso_from_any_directories (API_DSO_NAME, 0);
+		api_dso_handle = androidSystem.load_dso_from_any_directories (API_DSO_NAME, RTLD_NOW);
 	init_internal_api_dso (api_dso_handle);
 
 	mono_dl_fallback_register (monodroid_dlopen, monodroid_dlsym, nullptr, nullptr);

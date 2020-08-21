@@ -33,6 +33,12 @@
 #include <android/log.h>
 #endif
 
+#if defined (APPLE_OS_X)
+#include <dlfcn.h>
+#else
+#define RTLD_LAZY 0
+#endif  // def APPLE_OX_X
+
 #include "java-interop-util.h"
 
 #include "monodroid.h"
@@ -80,14 +86,15 @@ Debug::monodroid_profiler_load (const char *libmono_path, const char *desc, cons
 	}
 	simple_pointer_guard<char[]> mname (mname_ptr);
 
+	int dlopen_flags = RTLD_LAZY;
 	simple_pointer_guard<char[]> libname (utils.string_concat ("libmono-profiler-", mname.get (), ".so"));
 	bool found = false;
-	void *handle = androidSystem.load_dso_from_any_directories (libname, 0);
+	void *handle = androidSystem.load_dso_from_any_directories (libname, dlopen_flags);
 	found = load_profiler_from_handle (handle, desc, mname);
 
 	if (!found && libmono_path != nullptr) {
 		simple_pointer_guard<char[]> full_path (utils.path_combine (libmono_path, libname));
-		handle = androidSystem.load_dso (full_path, 0, FALSE);
+		handle = androidSystem.load_dso (full_path, dlopen_flags, FALSE);
 		found = load_profiler_from_handle (handle, desc, mname);
 	}
 
