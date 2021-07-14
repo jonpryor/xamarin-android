@@ -531,7 +531,7 @@ string.Join ("\n", packages.Select (x => metaDataTemplate.Replace ("%", x.Id))) 
 					},
 					new Package () {
 						Id = "Newtonsoft.Json",
-						Version = "10.0.3"
+						Version = "13.0.1"
 					},
 				},
 				OtherBuildItems = {
@@ -688,7 +688,6 @@ namespace App1
 				"System.Net.Http.dll",
 				"System.ServiceModel.Internals.dll",
 				"Newtonsoft.Json.dll",
-				"Microsoft.CSharp.dll",
 				"System.Numerics.dll",
 				"System.Xml.Linq.dll",
 			};
